@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>City of Fresno — Utilities Billing &amp; Collection Portal (Design Mockup)</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            fresno: {
+              navy: '#0f3c68',
+              blue: '#1a5a96',
+              sky: '#2b7bc6',
+              green: '#2d7a47',
+              lightGreen: '#eef7f0',
+              sand: '#f6f8fa'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="min-h-screen flex flex-col selection:bg-fresno-blue selection:text-white">
+
+  <!-- Top Prototype Banner -->
+  <div class="bg-slate-900 text-slate-200 text-xs py-2 px-4 border-b border-slate-700 no-print">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center px-2 py-0.5 rounded font-semibold bg-amber-400/20 text-amber-300 border border-amber-400/40 uppercase tracking-wider text-[10px]">
+          UI/UX Prototype Mockup
+        </span>
+        <span>Static HTML design draft populated from uploaded Cycle Bill statement (<span class="font-mono text-white">Acct #656219-226730</span>).</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="quick-switch-view-btn" type="button" class="text-sky-300 hover:text-sky-200 underline font-medium transition">
+          Switch to Itemized Portal View
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official-Style Municipal Header -->
+  <header class="bg-white border-b-4 border-fresno-green shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <!-- SVG Emblem inspired by Fresno Sunburst Logo on Cycle Bill -->
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-fresno-navy flex items-center justify-center text-white shadow-inner shrink-0">
+            <svg class="w-8 h-8 text-sky-300" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="32" cy="32" r="10" fill="currentColor" />
+              <g stroke="currentColor" stroke-width="3.5" stroke-linecap="round">
+                <line x1="32" y1="6" x2="32" y2="16" />
+                <line x1="32" y1="48" x2="32" y2="58" />
+                <line x1="6" y1="32" x2="16" y2="32" />
+                <line x1="48" y1="32" x2="58" y2="32" />
+                <line x1="13.6" y1="13.6" x2="20.7" y2="20.7" />
+                <line x1="43.3" y1="43.3" x2="50.4" y2="50.4" />
+                <line x1="50.4" y1="13.6" x2="43.3" y2="20.7" />
+                <line x1="20.7" y1="43.3" x2="13.6" y2="50.4" />
+              </g>
+            </svg>
+          </div>
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-widest text-fresno-blue">City of Fresno</div>
+            <div class="text-xl sm:text-2xl font-extrabold tracking-tight text-fresno-navy leading-none">
+              PUBLIC UTILITIES
+            </div>
+            <div class="text-xs text-slate-600 mt-0.5">
+              Utilities Billing &amp; Collection Division • 2680 Fresno St, Fresno, CA 93721-3689
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact & Session Status -->
+      <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm">
+        <div class="hidden md:block text-right border-r border-slate-200 pr-4">
+          <div class="font-semibold text-fresno-navy">Customer Support: (559) 621-6888</div>
+          <div class="text-slate-500">Water Conservation: (559) 621-6480</div>
+        </div>
+
+        <!-- Logged-In Badge (Hidden on Login View) -->
+        <div id="header-user-pill" class="hidden items-center gap-3 bg-slate-100 border border-slate-200 rounded-lg px-3 py-1.5">
+          <div class="text-left">
+            <div class="text-[11px] uppercase tracking-wider font-semibold text-slate-500">Active Account</div>
+            <div id="header-account-label" class="font-mono font-bold text-fresno-navy text-xs sm:text-sm">656219-226730</div>
+          </div>
+          <button id="logout-btn" type="button" class="px-2.5 py-1 rounded bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 border border-slate-300 text-xs font-medium transition">
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- VIEW 1: LANDING & ACCOUNT SIGN-IN PORTAL                  -->
+  <!-- ========================================================= -->
+  <main id="login-view" class="flex-1 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      
+      <!-- Left Column: Civic Portal Welcome & Watering Schedule Notice -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-fresno-lightGreen border border-fresno-green/30 text-fresno-green text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-fresno-green"></span>
+          Online Cycle Bill &amp; Consumption Portal
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-fresno-navy tracking-tight leading-tight">
+          View Your Itemized Utility Statement &amp; Water Usage
+        </h1>
+        <p class="text-slate-600 text-base leading-relaxed">
+          Access your City of Fresno Public Utilities cycle bill, review metered water consumption in gallons and HCF, inspect Solid Waste, Sanitation, and Sewer charges, and download your original statement scan.
+        </p>
+
+        <!-- Key Highlights Card from Bill -->
+        <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+            <span class="text-xs font-bold uppercase tracking-wider text-fresno-blue">Important City Notice • Effective June 1</span>
+            <span class="text-xs font-medium text-slate-500">Water Conservation: (559) 621-6480</span>
+          </div>
+          <h2 class="text-sm font-bold text-slate-800">Three-Day Outdoor Watering Schedule</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div class="font-bold text-fresno-navy">Odd-Numbered Addresses</div>
+              <div class="text-slate-600 mt-1">Tuesdays, Thursdays, and/or Saturdays</div>
+            </div>
+            <div class="p-3 rounded-lg bg-fresno-lightGreen border border-fresno-green/30">
+              <div class="font-bold text-fresno-green">Even-Numbered Addresses (e.g. 5466)</div>
+              <div class="text-slate-700 mt-1">Wednesdays, Fridays, and/or Sundays</div>
+            </div>
+          </div>
+          <p class="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 font-medium">
+            No watering is allowed on Mondays or between 10:00 AM and 6:00 PM on any day.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 pt-1 text-center sm:text-left">
+          <div class="bg-white/80 p-3.5 rounded-lg border border-slate-200/80">
+            <div class="text-xs text-slate-500 font-medium">Division Office</div>
+            <div class="text-xs sm:text-sm font-bold text-slate-800 mt-0.5">2680 Fresno St.</div>
+          </div>
+          <div class="bg-white/80 p-3.5 rounded-lg border border-slate-200/80">
+            <div class="text-xs text-slate-500 font-medium">Payment P.O. Box</div>
+            <div class="text-xs sm:text-sm font-bold text-slate-800 mt-0.5">PO Box 2069, Fresno</div>
+          </div>
+          <div class="bg-white/80 p-3.5 rounded-lg border border-slate-200/80">
+            <div class="text-xs text-slate-500 font-medium">Unit Conversion</div>
+            <div class="text-xs sm:text-sm font-bold text-slate-800 mt-0.5">1 HCF = 748 Gallons</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Account Login Form Card -->
+      <div class="lg:col-span-5">
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+          <div class="bg-fresno-navy px-6 py-5 text-white border-b-4 border-fresno-green">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-bold tracking-tight">Utility Bill Portal Sign-In</h2>
+              <span class="text-[11px] font-mono bg-white/15 px-2 py-0.5 rounded">Cycle/Route 32-06</span>
+            </div>
+            <p class="text-xs text-sky-200 mt-1">
+              Enter any Account Number &amp; Password/PIN to open the itemized statement portal.
+            </p>
+          </div>
+
+          <form id="portal-login-form" class="p-6 space-y-5" novalidate>
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="account-input" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Account Number
+                </label>
+                <span class="text-[11px] text-slate-500 font-mono">e.g. 656219-226730</span>
+              </div>
+              <input
+                id="account-input"
+                type="text"
+                required
+                value="656219-226730"
+                placeholder="Enter Account Number (any input accepted)"
+                class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-fresno-blue focus:border-fresno-blue transition"
+              />
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="password-input" class="block text-xs font-bold uppercase tracking-wider text-slate-700">
+                  Password / Internet Access PIN
+                </label>
+                <button
+                  id="toggle-pw-btn"
+                  type="button"
+                  class="text-[11px] text-fresno-blue hover:underline font-medium"
+                >
+                  Show / Hide
+                </button>
+              </div>
+              <input
+                id="password-input"
+                type="password"
+                required
+                value="0001154778"
+                placeholder="Enter Password or PIN (any input accepted)"
+                class="w-full rounded-lg border border-slate-300 px-3.5 py-2.5 text-sm font-mono text-slate-900 focus:outline-none focus:ring-2 focus:ring-fresno-blue focus:border-fresno-blue transition"
+              />
+              <p class="text-[11px] text-slate-500 mt-1.5">
+                Pre-filled with statement Account <span class="font-mono font-semibold text-slate-700">656219-226730</span> &amp; Internet Access PIN <span class="font-mono font-semibold text-slate-700">0001154778</span>, or type any value.
+              </p>
+            </div>
+
+            <div class="flex items-center justify-between text-xs">
+              <label class="inline-flex items-center gap-2 text-slate-600 cursor-pointer">
+                <input id="remember-account" type="checkbox" checked class="rounded border-slate-300 text-fresno-blue focus:ring-fresno-blue" />
+                <span>Remember account on this device</span>
+              </label>
+              <button id="fill-sample-btn" type="button" class="text-fresno-blue hover:text-fresno-navy font-semibold underline">
+                Reset to Statement Defaults
+              </button>
+            </div>
+
+            <div id="login-feedback" class="hidden rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-xs text-red-700"></div>
+
+            <button
+              type="submit"
+              class="w-full py-3 px-4 rounded-xl bg-fresno-green hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-sm shadow-md hover:shadow-lg transition flex items-center justify-center gap-2"
+            >
+              <span>View Itemized Utility Bill</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          </form>
+
+          <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
+            <span>Customer Name on File:</span>
+            <span class="font-mono font-semibold text-slate-800">ANDREW S HOVIOUS</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- VIEW 2: ITEMIZED BILLING PORTAL & UPLOADED BILL VIEWER    -->
+  <!-- ========================================================= -->
+  <main id="portal-view" class="hidden flex-1 py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-6">
+
+      <!-- Top Customer & Account Status Banner -->
+      <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="bg-gradient-to-r from-fresno-navy via-fresno-blue to-fresno-navy px-6 py-5 text-white flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-400/20 text-emerald-200 border border-emerald-300/30">
+                Cycle Bill Active
+              </span>
+              <span class="text-xs font-mono text-sky-200">
+                Bill Date: 10/03/26 • Service Period Thru: 10/01/26
+              </span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-1">
+              ANDREW S HOVIOUS
+            </h1>
+            <p class="text-xs sm:text-sm text-sky-100 flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
+              <span>Service Address: <strong class="text-white">5466 E LANSING WAY, FRESNO, CA 93727</strong></span>
+              <span>•</span>
+              <span>Account: <strong id="portal-acct-display" class="font-mono text-white">656219-226730</strong></span>
+              <span>•</span>
+              <span>Internet Access PIN: <strong class="font-mono text-white">0001154778</strong></span>
+              <span>•</span>
+              <span>Cycle/Route: <strong class="font-mono text-white">32-06</strong></span>
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 no-print">
+            <button
+              id="open-pay-modal-btn"
+              type="button"
+              class="px-4 py-2.5 rounded-xl bg-fresno-green hover:bg-emerald-600 text-white font-bold text-xs sm:text-sm shadow transition flex items-center gap-2"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              <span>Pay Current Bill ($108.68)</span>
+            </button>
+            <button
+              id="print-statement-btn"
+              type="button"
+              class="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/25 font-semibold text-xs sm:text-sm transition"
+            >
+              Print Summary
+            </button>
+          </div>
+        </div>
+
+        <!-- 4-Card KPI Strip directly from Cycle Bill -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 bg-slate-50/60">
+          <div class="p-4 sm:p-5">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Amount Due</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-fresno-navy font-mono mt-1">$108.68</div>
+            <div class="text-xs text-emerald-700 font-semibold mt-1">
+              Includes -$1.17 net balance credit vs $109.85 current charges
+            </div>
+          </div>
+          <div class="p-4 sm:p-5">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Current Due Date</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-mono mt-1">10/28/26</div>
+            <div class="text-xs text-amber-700 font-medium mt-1">
+              Amount Due After 10/29/26: <span class="font-mono font-bold">$110.85</span>
+            </div>
+          </div>
+          <div class="p-4 sm:p-5">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Last Payment Applied</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-fresno-green font-mono mt-1">$109.85-</div>
+            <div class="text-xs text-slate-600 mt-1">
+              Previous Balance: <span class="font-mono font-semibold">$109.85</span> • Bal Fwd: <span class="font-mono font-semibold">$0.00</span>
+            </div>
+          </div>
+          <div class="p-4 sm:p-5">
+            <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Water Consumption</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-fresno-blue font-mono mt-1">18.18 HCF</div>
+            <div class="text-xs text-slate-600 mt-1">
+              <span class="font-mono font-semibold">14,347 GALS</span> (Meter #12085711 • 1" Size)
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Navigation Tabs -->
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-3 no-print">
+        <div class="flex flex-wrap gap-2" role="tablist">
+          <button
+            type="button"
+            data-tab="overview"
+            class="portal-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition bg-fresno-navy text-white shadow-sm"
+          >
+            1. Itemized Bill &amp; Uploaded Statement
+          </button>
+          <button
+            type="button"
+            data-tab="document"
+            class="portal-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
+          >
+            2. Full-Resolution Cycle Bill Scan
+          </button>
+          <button
+            type="button"
+            data-tab="calculator"
+            class="portal-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition bg-white text-slate-700 hover:bg-slate-100 border border-slate-200"
+          >
+            3. Meter Read &amp; Usage Simulator
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <span>Layout Mode:</span>
+          <button
+            id="toggle-split-btn"
+            type="button"
+            class="px-3 py-1.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-700 hover:bg-slate-50 transition"
+          >
+            Side-by-Side Bill Image: ON
+          </button>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- TAB 1: ITEMIZED BILL & SIDE-BY-SIDE STATEMENT         -->
+      <!-- ===================================================== -->
+      <section id="tab-overview" class="space-y-6">
+        <div id="overview-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+          <!-- Left Column: Itemized Tables & Account Details -->
+          <div id="itemized-col" class="lg:col-span-7 space-y-6">
+
+            <!-- Account Summary & Previous Balance Reconciliation -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Account Summary Box (Green Header matching paper bill) -->
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-fresno-green text-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider flex items-center justify-between">
+                  <span>Account Summary</span>
+                  <span class="font-mono text-[11px] opacity-90">Cycle 32-06</span>
+                </div>
+                <dl class="divide-y divide-slate-100 text-xs sm:text-sm p-3">
+                  <div class="py-2 flex justify-between gap-2">
+                    <dt class="text-slate-600 font-medium">Bill Date</dt>
+                    <dd class="font-mono font-semibold text-slate-900">10/03/26</dd>
+                  </div>
+                  <div class="py-2 flex justify-between gap-2">
+                    <dt class="text-slate-600 font-medium">Customer Name</dt>
+                    <dd class="font-mono font-bold text-slate-900">ANDREW S HOVIOUS</dd>
+                  </div>
+                  <div class="py-2 flex justify-between gap-2">
+                    <dt class="text-slate-600 font-medium">Account Number</dt>
+                    <dd class="font-mono font-bold text-fresno-navy">656219-226730</dd>
+                  </div>
+                  <div class="py-2 flex justify-between gap-2">
+                    <dt class="text-slate-600 font-medium">Service Address</dt>
+                    <dd class="font-mono font-semibold text-slate-900">5466 E LANSING WAY</dd>
+                  </div>
+                  <div class="py-2 flex justify-between gap-2">
+                    <dt class="text-slate-600 font-medium">Service Period Thru</dt>
+                    <dd class="font-mono font-semibold text-slate-900">10/01/26</dd>
+                  </div>
+                  <div class="py-2 flex justify-between gap-2 bg-emerald-50/70 px-2 rounded">
+                    <dt class="text-fresno-green font-bold">Account Balance</dt>
+                    <dd class="font-mono font-extrabold text-fresno-green">$108.68</dd>
+                  </div>
+                  <div class="py-2 flex justify-between gap-2">
+                    <dt class="text-slate-600 font-medium">Due Date</dt>
+                    <dd class="font-mono font-bold text-slate-900">10/28/26</dd>
+                  </div>
+                  <div class="py-2 flex justify-between gap-2">
+                    <dt class="text-slate-600 font-medium">Deposit on File</dt>
+                    <dd class="font-mono font-semibold text-slate-900">$80.00</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <!-- Prior Balance & Payment Activity -->
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between">
+                <div>
+                  <div class="bg-fresno-green text-white px-4 py-2.5 text-xs font-bold uppercase tracking-wider flex items-center justify-between">
+                    <span>Balance Forward Summary</span>
+                    <span class="font-mono text-[11px] opacity-90">Prior Cycle</span>
+                  </div>
+                  <dl class="divide-y divide-slate-100 text-xs sm:text-sm p-3">
+                    <div class="py-2 flex justify-between gap-2">
+                      <dt class="text-slate-600 font-medium">Previous Balance</dt>
+                      <dd class="font-mono font-semibold text-slate-900">$109.85</dd>
+                    </div>
+                    <div class="py-2 flex justify-between gap-2">
+                      <dt class="text-slate-600 font-medium">Payments Received</dt>
+                      <dd class="font-mono font-bold text-fresno-green">$109.85 -</dd>
+                    </div>
+                    <div class="py-2 flex justify-between gap-2">
+                      <dt class="text-slate-600 font-medium">Adjustments</dt>
+                      <dd class="font-mono font-semibold text-slate-900">$0.00</dd>
+                    </div>
+                    <div class="py-2 flex justify-between gap-2">
+                      <dt class="text-slate-700 font-bold">Balance Forward</dt>
+                      <dd class="font-mono font-bold text-slate-900">$0.00</dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <!-- Mini Chart: Charge Distribution -->
+                <div class="p-3 bg-slate-50 border-t border-slate-200">
+                  <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+                    Current Charges Breakdown ($109.85)
+                  </div>
+                  <div class="relative h-36">
+                    <canvas id="charges-doughnut-chart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Itemized Current Billing Summary Table -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="bg-fresno-green text-white px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 class="text-sm font-bold uppercase tracking-wider">Current Billing Summary — Itemized Charges</h2>
+                  <p class="text-[11px] text-emerald-100">Exact line items populated from uploaded 10/03/26 Cycle Bill</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <select
+                    id="category-filter"
+                    aria-label="Filter utility charge category"
+                    class="rounded-lg bg-white/15 text-white border border-white/30 text-xs px-2.5 py-1.5 font-medium focus:outline-none"
+                  >
+                    <option value="ALL" class="text-slate-900">All Categories (4)</option>
+                    <option value="SOLID WASTE" class="text-slate-900">Solid Waste ($25.37)</option>
+                    <option value="SANITATION" class="text-slate-900">Sanitation ($6.23)</option>
+                    <option value="SEWER NON-METERED" class="text-slate-900">Sewer Non-Metered ($25.81)</option>
+                    <option value="WATER - METERED" class="text-slate-900">Water - Metered ($51.27)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-600">
+                      <th class="py-2.5 px-4">Service Category &amp; Line Item</th>
+                      <th class="py-2.5 px-4">Service Basis / Details</th>
+                      <th class="py-2.5 px-4 text-right">Item Charge</th>
+                      <th class="py-2.5 px-4 text-right">Category Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="itemized-charges-tbody" class="divide-y divide-slate-200 text-xs sm:text-sm">
+                    <!-- Populated dynamically via JS from grounded bill data -->
+                  </tbody>
+                  <tfoot class="bg-slate-50 border-t-2 border-slate-300 text-xs sm:text-sm">
+                    <tr class="border-b border-slate-200">
+                      <td colspan="3" class="py-2.5 px-4 font-bold text-slate-700 text-right">Current Charges Subtotal</td>
+                      <td class="py-2.5 px-4 font-mono font-bold text-slate-900 text-right">$109.85</td>
+                    </tr>
+                    <tr class="bg-emerald-50/90 border-b border-emerald-200">
+                      <td colspan="3" class="py-3 px-4 font-extrabold text-fresno-navy text-right uppercase tracking-wide">
+                        TOTAL AMOUNT DUE (By 10/28/26)
+                      </td>
+                      <td class="py-3 px-4 font-mono text-base font-extrabold text-fresno-green text-right">$108.68</td>
+                    </tr>
+                    <tr>
+                      <td colspan="3" class="py-2.5 px-4 font-semibold text-amber-800 text-right">
+                        Amount Due After 10/29/26
+                      </td>
+                      <td class="py-2.5 px-4 font-mono font-bold text-amber-900 text-right">$110.85</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            <!-- Consumption Detail Table (Exact replica of paper bill grid) -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="bg-slate-800 text-white px-5 py-2.5 flex flex-wrap items-center justify-between gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider">Consumption Detail (Metered Water)</span>
+                <span class="text-[11px] font-mono text-slate-300">1 HCF (Hundred Cubic Feet) = 748 GALS (Gallons)</span>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-center border-collapse text-xs sm:text-sm">
+                  <thead>
+                    <tr class="bg-slate-100 border-b border-slate-200 text-[11px] font-bold uppercase text-slate-600">
+                      <th class="py-2.5 px-3 border-r border-slate-200">Read Date</th>
+                      <th class="py-2.5 px-3 border-r border-slate-200">Service</th>
+                      <th class="py-2.5 px-3 border-r border-slate-200">Meter #</th>
+                      <th class="py-2.5 px-3 border-r border-slate-200">Meter Size</th>
+                      <th class="py-2.5 px-3 border-r border-slate-200">Current Read</th>
+                      <th class="py-2.5 px-3 border-r border-slate-200">Previous Read</th>
+                      <th class="py-2.5 px-3 border-r border-slate-200">Reading Units</th>
+                      <th class="py-2.5 px-3">Consumption</th>
+                    </tr>
+                  </thead>
+                  <tbody class="font-mono text-slate-900 font-semibold">
+                    <tr class="border-b border-slate-200 bg-white">
+                      <td class="py-3 px-3 border-r border-slate-200">10/01</td>
+                      <td class="py-3 px-3 border-r border-slate-200">WA</td>
+                      <td class="py-3 px-3 border-r border-slate-200">12085711</td>
+                      <td class="py-3 px-3 border-r border-slate-200">1"</td>
+                      <td class="py-3 px-3 border-r border-slate-200">98517</td>
+                      <td class="py-3 px-3 border-r border-slate-200">84167</td>
+                      <td class="py-3 px-3 border-r border-slate-200">GALS</td>
+                      <td class="py-3 px-3 text-fresno-blue font-bold">18.18 HCF</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="bg-slate-50 px-4 py-3 border-t border-slate-200 flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span class="font-medium text-slate-700">
+                  Last Month's Average Household Use is <strong class="font-mono text-slate-900">13,879 gallons</strong> — Your use is <strong class="font-mono text-fresno-blue">14,347 gallons</strong>
+                </span>
+                <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-mono text-[11px] font-semibold">
+                  +468 GALS (+3.37%) vs Avg Household
+                </span>
+              </div>
+            </div>
+
+            <!-- Important Message & Remittance Coupon Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-fresno-blue text-white px-4 py-2 text-xs font-bold uppercase tracking-wider">
+                  Important Message
+                </div>
+                <div class="p-4 text-xs space-y-2.5 text-slate-700 leading-relaxed">
+                  <p class="font-bold text-slate-900">Three Day Outdoor Watering schedule as of June 1</p>
+                  <p>
+                    <strong>Odd numbered addresses</strong> may water on Tuesdays, Thursdays and/or Saturdays.
+                  </p>
+                  <p class="p-2 rounded bg-fresno-lightGreen border border-fresno-green/30 text-slate-800">
+                    <strong>Even numbered addresses (5466 E Lansing Way)</strong> may water on <strong>Wednesdays, Fridays and/or Sundays</strong>.
+                  </p>
+                  <p class="text-red-700 font-semibold">
+                    No watering is allowed on Mondays or between 10AM and 6PM.
+                  </p>
+                  <p class="text-slate-500 pt-1 border-t border-slate-100">
+                    For help setting your sprinkler timer call Water Conservation at <strong>(559) 621-6480</strong>.
+                  </p>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col justify-between">
+                <div class="bg-slate-700 text-white px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center justify-between">
+                  <span>Remittance Stub Details</span>
+                  <span class="font-mono text-[10px]">Page # 1 of 1</span>
+                </div>
+                <div class="p-4 text-xs space-y-2 text-slate-700">
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Account Number:</span>
+                    <span class="font-mono font-bold text-slate-900">656219-226730</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Current Charges Due By 10/28/26:</span>
+                    <span class="font-mono font-bold text-slate-900">$108.68</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-500">Total Amount Due:</span>
+                    <span class="font-mono font-extrabold text-fresno-green">$108.68</span>
+                  </div>
+                  <div class="pt-2 border-t border-slate-100">
+                    <div class="text-[11px] text-slate-500 uppercase font-semibold">Make Checks Payable To:</div>
+                    <div class="font-mono text-[11px] text-slate-800 mt-0.5">
+                      CITY OF FRESNO — UTILITIES BILLING &amp; COLLECTION<br />
+                      PO BOX 2069, FRESNO, CA 93716-4059
+                    </div>
+                  </div>
+                  <div class="pt-2 border-t border-slate-100">
+                    <div class="text-[10px] text-slate-400 uppercase font-semibold">OCR Scan Line</div>
+                    <div class="font-mono text-[11px] tracking-widest text-slate-600 bg-slate-100 px-2 py-1 rounded mt-0.5 select-all">
+                      00065621900022673000000108686
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Uploaded Cycle Bill Document Preview -->
+          <div id="bill-preview-col" class="lg:col-span-5 space-y-3 lg:sticky lg:top-6">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+              <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between gap-2">
+                <div>
+                  <h3 class="text-xs font-bold uppercase tracking-wider text-sky-300">Uploaded Cycle Bill Statement</h3>
+                  <p class="text-[11px] text-slate-300">Original scanned statement (10/03/26)</p>
+                </div>
+                <button
+                  id="expand-bill-tab-btn"
+                  type="button"
+                  class="px-2.5 py-1 rounded bg-white/15 hover:bg-white/25 text-xs font-semibold text-white transition"
+                >
+                  Open Full Zoom View
+                </button>
+              </div>
+              <div class="p-3 bg-slate-100 max-h-[760px] overflow-y-auto">
+                <img
+                  src="assets/cycle-bill-10-03-26.jpg"
+                  alt="Uploaded City of Fresno Cycle Bill for Andrew S Hovious, Account 656219-226730"
+                  class="w-full h-auto rounded-lg bill-paper border border-slate-300"
+                />
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================== -->
+      <!-- TAB 2: FULL-RESOLUTION UPLOADED BILL SCAN VIEWER      -->
+      <!-- ===================================================== -->
+      <section id="tab-document" class="hidden space-y-4">
+        <div class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-base font-bold text-fresno-navy">Original Uploaded Statement Viewer</h2>
+            <p class="text-xs text-slate-600">
+              Inspect the physical City of Fresno Cycle Bill scan for Account <span class="font-mono font-semibold">656219-226730</span> (Bill Date <span class="font-mono font-semibold">10/03/26</span>).
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold text-slate-500 mr-1">Zoom Level:</span>
+            <button type="button" data-zoom="100" class="zoom-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-fresno-navy text-white">Fit Width</button>
+            <button type="button" data-zoom="125" class="zoom-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">125%</button>
+            <button type="button" data-zoom="150" class="zoom-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">150%</button>
+          </div>
+        </div>
+
+        <div class="bg-slate-800 rounded-2xl p-4 sm:p-6 overflow-auto max-h-[82vh] flex justify-center border border-slate-700">
+          <div id="zoom-container" class="w-full max-w-4xl transition-all duration-200">
+            <img
+              src="assets/cycle-bill-10-03-26.jpg"
+              alt="Full Resolution City of Fresno Cycle Bill Scan"
+              class="w-full h-auto rounded-lg shadow-2xl border border-slate-600"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================== -->
+      <!-- TAB 3: METER READ & WATER USAGE SIMULATOR             -->
+      <!-- ===================================================== -->
+      <section id="tab-calculator" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Left: Interactive Water Consumption Estimator -->
+          <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-5">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-fresno-blue">Interactive Rate &amp; Meter Analysis</span>
+              <h2 class="text-lg font-extrabold text-fresno-navy mt-0.5">Water Consumption &amp; Bill Estimator</h2>
+              <p class="text-xs text-slate-600 mt-1">
+                Based on Meter #12085711 (1" Meter Service Charge: <span class="font-mono font-semibold">$17.90</span> + Volumetric Rate: <span class="font-mono font-semibold">~$1.8355 / HCF</span> from $33.37 ÷ 18.18 HCF).
+              </p>
+            </div>
+
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+              <div>
+                <div class="flex justify-between text-xs font-bold text-slate-700 mb-1.5">
+                  <label for="sim-gallons-slider">Simulated Monthly Water Usage (Gallons)</label>
+                  <span id="sim-gallons-readout" class="font-mono text-fresno-blue text-sm">14,347 GALS (18.18 HCF)</span>
+                </div>
+                <input
+                  id="sim-gallons-slider"
+                  type="range"
+                  min="3000"
+                  max="30000"
+                  step="100"
+                  value="14347"
+                  class="w-full accent-fresno-blue cursor-pointer"
+                />
+                <div class="flex justify-between text-[11px] text-slate-500 mt-1 font-mono">
+                  <span>3,000 GALS (4.01 HCF)</span>
+                  <span>Avg: 13,879 GALS</span>
+                  <span>30,000 GALS (40.11 HCF)</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap gap-2 pt-1">
+                <button type="button" id="preset-actual-btn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-fresno-navy text-white">
+                  Actual Bill (14,347 GALS)
+                </button>
+                <button type="button" id="preset-avg-btn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-100">
+                  Last Month Household Avg (13,879 GALS)
+                </button>
+                <button type="button" id="preset-conserve-btn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 border border-emerald-300 text-emerald-800 hover:bg-emerald-100">
+                  15% Conservation Target (12,195 GALS)
+                </button>
+              </div>
+            </div>
+
+            <!-- Simulated Bill Output Table -->
+            <div class="border border-slate-200 rounded-xl overflow-hidden">
+              <table class="w-full text-xs sm:text-sm">
+                <tbody class="divide-y divide-slate-200">
+                  <tr class="bg-slate-50">
+                    <td class="py-2.5 px-4 font-medium text-slate-600">Fixed 1" Water Meter Service Charge</td>
+                    <td class="py-2.5 px-4 font-mono font-semibold text-right text-slate-900">$17.90</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-4 font-medium text-slate-600">Simulated Water Consumption Charge</td>
+                    <td id="sim-water-vol-charge" class="py-2.5 px-4 font-mono font-bold text-right text-fresno-blue">$33.37</td>
+                  </tr>
+                  <tr class="bg-sky-50/60">
+                    <td class="py-2.5 px-4 font-bold text-fresno-navy">Estimated Total Water - Metered</td>
+                    <td id="sim-water-total" class="py-2.5 px-4 font-mono font-extrabold text-right text-fresno-navy">$51.27</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-4 font-medium text-slate-600">Solid Waste + Sanitation + Sewer (Fixed Non-Metered)</td>
+                    <td class="py-2.5 px-4 font-mono font-semibold text-right text-slate-800">$57.41</td>
+                  </tr>
+                  <tr class="bg-emerald-50">
+                    <td class="py-3 px-4 font-extrabold text-fresno-green">Estimated Total Monthly Charges</td>
+                    <td id="sim-grand-total" class="py-3 px-4 font-mono text-base font-extrabold text-right text-fresno-green">$108.68</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Usage Comparison Bar Chart -->
+          <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between space-y-4">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-fresno-green">Consumption Benchmark</span>
+              <h3 class="text-lg font-extrabold text-fresno-navy mt-0.5">Household Water Use Comparison (Gallons)</h3>
+              <p class="text-xs text-slate-600 mt-1">
+                Compares your meter reading (<span class="font-mono">98517 - 84167</span>) against Last Month's Average Household Use (<span class="font-mono">13,879 gallons</span>) and your simulated target.
+              </p>
+            </div>
+
+            <div class="relative h-72">
+              <canvas id="usage-comparison-chart"></canvas>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+              <span>Meter Serial #: <strong class="font-mono text-slate-900">12085711</strong> (Size: 1")</span>
+              <span>Conversion: <strong class="font-mono text-slate-900">1 HCF = 748 GALS</strong></span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- MOCK PAYMENT CONFIRMATION MODAL                           -->
+  <!-- ========================================================= -->
+  <div id="payment-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl overflow-hidden">
+      <div class="bg-fresno-navy px-6 py-4 text-white flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold">Submit Utility Bill Payment (Mockup)</h3>
+          <p class="text-xs text-sky-200 font-mono">Account #656219-226730 • ANDREW S HOVIOUS</p>
+        </div>
+        <button id="close-pay-modal-btn" type="button" class="text-slate-300 hover:text-white text-lg font-bold px-2">✕</button>
+      </div>
+      <form id="mock-pay-form" class="p-6 space-y-4 text-xs sm:text-sm">
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Current Charges Due By 10/28/26:</span>
+            <span class="font-mono font-bold text-slate-900">$108.68</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Amount Due After 10/29/26:</span>
+            <span class="font-mono font-semibold text-amber-800">$110.85</span>
+          </div>
+        </div>
+
+        <div>
+          <label for="pay-amount-input" class="block text-xs font-bold uppercase text-slate-700 mb-1">Payment Amount ($)</label>
+          <input
+            id="pay-amount-input"
+            type="number"
+            step="0.01"
+            value="108.68"
+            class="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm font-bold text-slate-900"
+          />
+        </div>
+
+        <div>
+          <label for="pay-method-select" class="block text-xs font-bold uppercase text-slate-700 mb-1">Payment Method</label>
+          <select id="pay-method-select" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-800">
+            <option value="Electronic Check (ACH)">Electronic Check (ACH) — No Fee</option>
+            <option value="Visa / Mastercard Debit">Visa / Mastercard Debit</option>
+            <option value="Account Deposit Credit">Apply from Deposit on File ($80.00)</option>
+          </select>
+        </div>
+
+        <div id="pay-receipt-box" class="hidden rounded-xl bg-emerald-50 border border-emerald-200 p-3.5 text-xs text-emerald-900 space-y-1"></div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button
+            id="cancel-pay-btn"
+            type="button"
+            class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-50"
+          >
+            Close
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-lg bg-fresno-green hover:bg-emerald-700 text-white font-bold shadow"
+          >
+            Confirm Mock Payment
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 mt-auto py-4 px-4 sm:px-6 lg:px-8 text-xs text-slate-500 no-print">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div>
+        <strong>City of Fresno — Utilities Billing &amp; Collection Division</strong> • PO Box 2069, Fresno, CA 93717-2069
+      </div>
+      <div>
+        Static HTML Portal Prototype • Statement Account <span class="font-mono text-slate-700">656219-226730</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
